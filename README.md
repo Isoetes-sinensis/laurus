@@ -1,7 +1,7 @@
 # *Laurus* - A Plant Guessing Game
 
-[!WARNING]
-This project is currently under construction.
+> [!WARNING]
+> This project is currently under construction.
 
 ## Description
 - This is a web application for testing users' plant knowledge.
