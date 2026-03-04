@@ -1,4 +1,4 @@
-import { fetchINaturalistObs } from "@/app/_actions/data";
+import { fetchINaturalistObs, fetchINaturalistTaxa } from "@/app/_actions/data";
 
 export default async function Page() {
     // Fetch image data.
@@ -14,13 +14,15 @@ export default async function Page() {
     // (Check if there is a medium-size image. If not, return the large/original size.)
 
     // Get name data.
-    const speciesName = data.taxon.name;
-    // ...
+    const species = data.taxon.name;
+    const taxonData = await fetchINaturalistTaxa(data.taxon.id);
+    const genus = taxonData.ancestors.find(ancestor => ancestor.rank === 'genus')?.name;
+    const family = taxonData.ancestors.find(ancestor => ancestor.rank === 'family')?.name;
 
     return (
         <div>
             <img src={photoLink} alt="plant image" />
-            <div>{speciesName}</div>
+            <div>{`${family} ${genus} ${species}`}</div>
             <div>Guess from here.</div>
         </div>
     );
