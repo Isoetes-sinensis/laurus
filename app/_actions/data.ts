@@ -3,7 +3,8 @@ import type { INaturalistObsType, INaturalistTaxaType } from "@/app/_actions/typ
 // Fetch iNaturalist observation data.
 export async function fetchINaturalistObs(): Promise<INaturalistObsType> {
     // Only fecth one piece of species data of vascular plants (id: 211194) with research-level quality rates.
-    const apiLink = `https://api.inaturalist.org/v1/observations?identified=true&photos=true&rank=species&taxon_id=211194&quality_grade=research&page=1&per_page=1&order_by=random`;
+    const seed = Math.floor(Math.random() * 100000000); // Of no use to API, but avoids always fetching the same data.
+    const apiLink = `https://api.inaturalist.org/v1/observations?identified=true&photos=true&rank=species&taxon_id=211194&quality_grade=research&page=1&per_page=1&order_by=random&seed=${seed}`;
 
     try {
         const data = await fetch(apiLink);
