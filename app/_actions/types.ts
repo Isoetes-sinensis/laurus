@@ -23,3 +23,15 @@ export type INaturalistTaxaType = {
         }
     ];
 }
+
+export type TaxonNames = {
+    family: string;
+    genus: string;
+    specEpithet: string; 
+}
+
+export type GameState = {
+    photoLink: string;
+    taxonId: number;
+    score: number;
+}
