@@ -30,7 +30,7 @@ export async function submitAnswers(prevState: GameState, formData: FormData) {
     }
 
     // Fetch new data.
-    const {photoLink, data} = await fetchINaturalistObsAndPhoto('medium');
+    const {photoLink, data} = await fetchINaturalistObsAndPhoto('large');
 
     return {
         photoLink: photoLink,

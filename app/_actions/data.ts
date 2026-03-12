@@ -32,13 +32,15 @@ export async function fetchINaturalistTaxa(id: number): Promise<INaturalistTaxaT
 
 // Fetch iNaturalist observation data, with a photo in the required size.
 export async function fetchINaturalistObsAndPhoto(size: 'square' | 'medium' | 'large' | 'original') {
-    const data = await fetchINaturalistObs();
-    const orgPhotoLink = data.photos[0].url; // Always returns the first photo.
-    const parts = orgPhotoLink.split('/');
-    const [, format] = parts[parts.length - 1].split('.')
-    let photoLink = parts.slice(0, parts.length - 1).join('/');
-    photoLink += '/' + size + '.' + format;
-    // (Check if there is an image in the required size.)
+    let data = null;
+    let photoLink = '';
+
+    do {
+        data = await fetchINaturalistObs();
+        photoLink = data.photos[0].url; // Always returns the first photo.
+    } while (!photoLink.includes('inaturalist-open-data')); // Always fetch a photo shared under open license.
+
+    photoLink = photoLink.replace('square', size); // (Check if there is an image in the required size.)
     
     return {data, photoLink};
 }

@@ -17,3 +17,14 @@ export function HollowButton({ children, className, ...rest }: ButtonProps) {
         </div>
     );
 }
+
+export function PrimaryButton({ children, className, ...rest }: ButtonProps) {
+    return (
+        <button
+            {...rest}
+            className={"p-1 rounded-full bg-laurus-green text-white text-transparent cursor-pointer " + className}
+        >
+            {children}
+        </button>
+    );
+}
