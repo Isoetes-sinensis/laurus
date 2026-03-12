@@ -1,13 +1,16 @@
 import Link from "next/link";
-import { Button } from "@/app/_components/buttons";
+import { HollowButton } from "@/app/_components/buttons";
+import Image from "next/image";
 
 export default function Home() {
-return (
-  <>
-    <h1 className="text-black text-5xl">Laurus: A Plant Guessing Game</h1>
-    <Link href="/game"><Button>Play</Button></Link>
-    <Link href="#"><Button>Login</Button></Link>
-    <Link href="#"><Button>About</Button></Link>
-  </>
-);
+    return (
+        <div className="flex flex-col lg:w-1/2 px-8 items-center justify-center gap-10">
+            <Image src="/laurus-logo-with-name-v1.svg" alt="Laurus" width={300} height={300} />
+            <div className="flex flex-col w-full max-w-75 gap-2">
+                <Link href="/game"><HollowButton className="w-full">Play</HollowButton></Link>
+                <Link href="#"><HollowButton className="w-full">Login</HollowButton></Link>
+                <Link href="#"><HollowButton className="w-full">About</HollowButton></Link>
+            </div>
+        </div>
+    );
 }
