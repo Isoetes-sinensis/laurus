@@ -31,7 +31,12 @@ export type TaxonNames = {
 }
 
 export type GameState = {
+    round: number;
     photoLink: string;
     taxonId: number;
+    submitted: boolean;
+    family: { correct: boolean; correctAnswer: string };
+    genus: { correct: boolean; correctAnswer: string };
+    specEpithet: { correct: boolean; correctAnswer: string };
     score: number;
 }
