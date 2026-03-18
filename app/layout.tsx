@@ -1,5 +1,5 @@
 import "@/app/globals.css";
-import "@/app/colors.css";
+import "@/app/themes.css";
 import { Voltaire } from "next/font/google";
 
 const voltaire = Voltaire({
