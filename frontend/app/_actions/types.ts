@@ -40,3 +40,11 @@ export type GameState = {
     specEpithet: { correct: boolean; correctAnswer: string };
     score: number;
 }
+
+export type LoginFormState = {
+    errors?: {
+        username?: string[];
+        password?: string[];
+    }
+    message?: string[];
+}

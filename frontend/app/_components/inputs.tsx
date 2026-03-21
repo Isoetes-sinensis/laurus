@@ -1,11 +1,25 @@
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     className?: string;
+}
+
+interface RightWrongInputProps extends InputProps {
     submitted: boolean;
     correct: boolean;
     correctAnswer: string;
 }
 
-export function RightWrongInput({ className, submitted, correct, correctAnswer, ...rest }: InputProps) {
+export function Input({ className, ...rest }: InputProps) {
+    const finalClass = `p-1 border-2 border-2 disabled:border-gray-400 rounded-md ${className}`;
+
+    return (
+        <input
+            {...rest}
+            className={finalClass}
+        />
+    );
+}
+
+export function RightWrongInput({ className, submitted, correct, correctAnswer, ...rest }: RightWrongInputProps) {
     let borderClass = 'border-2 disabled:border-gray-400';
     let textClass = '';
 

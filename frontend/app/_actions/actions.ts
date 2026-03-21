@@ -1,8 +1,13 @@
 'use server';
 
 import { fetchINaturalistObsAndPhoto, fetchINaturalistTaxa } from "@/app/_actions/data";
-import { GameState } from "@/app/_actions/types";
+import { GameState, LoginFormState } from "@/app/_actions/types";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import z from "zod";
 
+// Submit and check user answers.
 export async function submitAnswers(prevState: GameState, formData: FormData) {
     // (Validate form data.)
 
@@ -57,4 +62,56 @@ export async function submitAnswers(prevState: GameState, formData: FormData) {
     }
 
     return state;
+}
+
+// Login.
+export async function login(prevState: LoginFormState, formData: FormData) {
+    // Validate username and password.
+    const LoginSchema = z.object({
+        username: z.string()
+            .min(1, 'Username cannot be empty.')
+            .trim(),
+        password: z.string()
+            .min(1, 'Password cannot be empty.')
+    });
+    const validatedData = LoginSchema.safeParse({
+        username: formData.get('username'),
+        password: formData.get('password')
+    });
+    if (!validatedData.success) {
+        const errors = z.flattenError(validatedData.error).fieldErrors;
+        return { errors: errors };
+    }
+
+    // Login from the backend.
+    const searchParams = new URLSearchParams();
+    searchParams.append('username', validatedData.data.username);
+    searchParams.append('password', validatedData.data.password);
+    try {
+        const res = await fetch('http://localhost:8000/auth/login', {
+            method: 'POST',
+            body: searchParams,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
+        if (!res.ok) {
+            console.log(res.status, res.statusText);
+            return { message: ['Incorrect username or password.'] };
+        }
+        else {
+            const data = await res.json();
+            const cookieStore = await cookies();
+            cookieStore.set({
+                name: 'access_token',
+                value: data.access_token,
+                httpOnly: true
+            }); // Store the access token in cookies.
+            redirect('/');
+        }
+    } catch (error) {
+        if (isRedirectError(error)) throw error; // Skip errors thrown by redirect('/').
+        console.log(error); // Add functions to deal with errors.
+        throw error;
+    }
 }
