@@ -11,30 +11,45 @@ import z from "zod";
 export async function submitAnswers(prevState: GameState, formData: FormData) {
     // (Validate form data.)
 
-    let state = { ...prevState };
+    let state = JSON.parse(JSON.stringify(prevState));
 
+    // Go to the next round if user chooses to continue.
     if (state.submitted) {
-        state.submitted = false;
-        state.round += 1;
+        // Game completed when reaching the maximum round.
+        if (state.currentRound >= state.maxRound) {
+            state.completed = true;
+        } else {
+            state.submitted = false;
+            state.currentRound += 1;
 
-        // Fetch new data.
-        const {photoLink, data} = await fetchINaturalistObsAndPhoto('large');
-        state.photoLink = photoLink;
-        state.taxonId = data.taxon.id;
+            // Fetch new data before the next round.
+            const {photoLink, data} = await fetchINaturalistObsAndPhoto('large');
+            state.rounds.push({ 
+                round: state.currentRound,
+                photoLink: photoLink,
+                taxonId: data.taxon.id,
+                family: { userAnswer: '', correctAnswer: '', correct: false },
+                genus: { userAnswer: '', correctAnswer: '', correct: false },
+                specEpithet: { userAnswer: '', correctAnswer: '', correct: false },
+                score: 0
+            });
+        }
     }
+
+    // Check the answers after submission.
     else {
         state.submitted = true;
 
         // Get actual taxon names.
-        const taxonData = await fetchINaturalistTaxa(prevState.taxonId);
+        const taxonData = await fetchINaturalistTaxa(state.rounds[state.currentRound - 1].taxonId);
         const specEpithet = taxonData.name.split(' ')[1];
         const genus = taxonData.ancestors.find(ancestor => ancestor.rank === 'genus')?.name as string;
         const family = taxonData.ancestors.find(ancestor => ancestor.rank === 'family')?.name as string;
 
         // Get user's answers.
-        const familyAnswer = formData.get('family');
-        const genusAnswer = formData.get('genus');
-        const specEpithetAnswer = formData.get('species');
+        const familyAnswer = (formData.get('family') ?? '') as string;
+        const genusAnswer = (formData.get('genus') ?? '') as string;
+        const specEpithetAnswer = (formData.get('species') ?? '') as string;
 
         // Calculate user's score.
         let score = 0;
@@ -55,10 +70,11 @@ export async function submitAnswers(prevState: GameState, formData: FormData) {
             }
         }
 
-        state.score += score;
-        state.family = { correct: familyCorrect, correctAnswer: family };
-        state.genus = { correct: genusCorrect, correctAnswer: genus };
-        state.specEpithet = { correct: speciesCorrect, correctAnswer: specEpithet };
+        state.totalScore += score;
+        state.rounds[state.currentRound - 1].score = score;
+        state.rounds[state.currentRound - 1].family = { userAnswer: familyAnswer, correctAnswer: family, correct: familyCorrect };
+        state.rounds[state.currentRound - 1].genus = { userAnswer: genusAnswer, correctAnswer: genus, correct: genusCorrect };
+        state.rounds[state.currentRound - 1].specEpithet = { userAnswer:specEpithetAnswer, correctAnswer: specEpithet, correct: speciesCorrect };
     }
 
     return state;

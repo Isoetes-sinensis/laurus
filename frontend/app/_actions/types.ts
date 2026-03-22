@@ -30,15 +30,30 @@ export type TaxonNames = {
     specEpithet: string; 
 }
 
-export type GameState = {
+type Answer = {
+    userAnswer: string;
+    correctAnswer: string;
+    correct: boolean;
+}
+
+type RoundState = {
     round: number;
     photoLink: string;
     taxonId: number;
-    submitted: boolean;
-    family: { correct: boolean; correctAnswer: string };
-    genus: { correct: boolean; correctAnswer: string };
-    specEpithet: { correct: boolean; correctAnswer: string };
+    family: Answer;
+    genus: Answer;
+    specEpithet: Answer;
     score: number;
+}
+
+export type GameState = {
+    mode: 'default';
+    maxRound: number;
+    totalScore: number;
+    currentRound: number;
+    submitted: boolean;
+    completed: boolean;
+    rounds: RoundState[];
 }
 
 export type LoginFormState = {
