@@ -53,6 +53,7 @@ export type GameState = {
     currentRound: number;
     submitted: boolean;
     completed: boolean;
+    completedAt?: string;
     rounds: RoundState[];
 }
 

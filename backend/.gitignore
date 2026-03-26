@@ -1,3 +1,9 @@
+# cache
 __pycache__
+
+# environment
 .venv
 .env
+
+# database
+*.db

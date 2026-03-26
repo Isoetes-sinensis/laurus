@@ -18,6 +18,7 @@ export async function submitAnswers(prevState: GameState, formData: FormData) {
         // Game completed when reaching the maximum round.
         if (state.currentRound >= state.maxRound) {
             state.completed = true;
+            state.completedAt = new Date().toISOString();
         } else {
             state.submitted = false;
             state.currentRound += 1;
