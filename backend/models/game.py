@@ -1,4 +1,5 @@
 from datetime import datetime
+from pydantic import BaseModel
 from sqlmodel import SQLModel, Field
 
 
@@ -9,7 +10,7 @@ class GameBase(SQLModel):
 class Game(GameBase, table=True):
     user_id: int = Field(foreign_key='user.id', index=True)
     mode: str
-    rounds: int # Stored as log data, even though can be calculated.
+    round_count: int # Stored as log data, even though can be calculated.
     completed_at: datetime
     score: int # Stored as log data, even though can be calculated.
 
@@ -28,3 +29,30 @@ class Answer(GameBase, table=True):
     user_answer: str | None
     correct_answer: str
     correct: bool
+
+
+class AnswerIn(BaseModel):
+    userAnswer: str
+    correctAnswer: str
+    correct: bool
+
+
+class RoundIn(BaseModel):
+    round: int
+    photoLink: str
+    taxonId: int
+    family: AnswerIn
+    genus: AnswerIn
+    specEpithet: AnswerIn
+    score: int
+
+
+class GameIn(BaseModel):
+    mode: str
+    maxRound: int
+    totalScore: int
+    currentRound: int
+    submitted: bool
+    completed: bool
+    completedAt: datetime
+    rounds: list[RoundIn]

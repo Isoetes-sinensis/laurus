@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from database import create_db_and_tables
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import auth
+from routers import auth, answers, games, rounds
 
 
 @asynccontextmanager
@@ -12,7 +12,12 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
 app.include_router(auth.router)
+app.include_router(games.router)
+app.include_router(rounds.router)
+app.include_router(answers.router)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
