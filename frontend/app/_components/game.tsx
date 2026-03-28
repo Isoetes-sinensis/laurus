@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { GameState, TaxonNames } from "@/app/_actions/types";
-import { submitAnswers } from "@/app/_actions/actions";
+import { saveGame, submitAnswers } from "@/app/_actions/actions";
 import Image from "next/image";
 import { RightWrongInput } from "@/app/_components/inputs";
 import { PrimaryButton } from "@/app/_components/buttons";
@@ -112,14 +112,19 @@ function GameContinuing({ state, formAction, isPending }: {
     );
 }
 
-function GameCompleted({ state }: {
+function GameCompleted({ state, loggedIn }: {
     state: GameState;
+    loggedIn: boolean;
 }) {
-    const handleClick = () => {
-        // (Store game results to the backend.)
+    const [saved, setSaved] = useState(false);
 
-        redirect('/');
+    const handleClick = async () => {
+        const success = await saveGame(state);
+        setSaved(success);
     };
+    const saveButton = saved ? 
+        <PrimaryButton className="bg-gray-400" disabled>saved</PrimaryButton> :
+        <PrimaryButton onClick={handleClick}>save game result</PrimaryButton>;
 
     return (
         <div className="flex flex-col w-full h-full items-center justify-center gap-8 text-xl">
@@ -127,15 +132,17 @@ function GameCompleted({ state }: {
             <div className="flex flex-col w-4/5 lg:w-1/2 gap-4">
                 <div>Rounds: {state.maxRound}</div>
                 <div>Score: {state.totalScore}</div>
-                <PrimaryButton onClick={handleClick}>continue</PrimaryButton>
+                {loggedIn ? saveButton : null}
+                <PrimaryButton onClick={() => {redirect('/');}}>continue</PrimaryButton>
             </div>
         </div>
     );
 }
 
-export default function Game({ photoLink, taxonId }: { 
-    photoLink: string; // link of the plant image to display
+export default function Game({ photoLink, taxonId, loggedIn }: { 
+    photoLink: string; // link of the first plant image to display
     taxonId: number; // taxon ID of the plant
+    loggedIn: boolean; // whether a user has logged in
 }) {
     const initialState: GameState = {
         mode: 'default',
@@ -157,5 +164,5 @@ export default function Game({ photoLink, taxonId }: {
         ]
     };
     const [state, formAction, isPending] = useActionState(submitAnswers, initialState);
-    return state.completed ? <GameCompleted state={state} /> : <GameContinuing state={state} formAction={formAction} isPending={isPending} />;
+    return state.completed ? <GameCompleted state={state} loggedIn={loggedIn} /> : <GameContinuing state={state} formAction={formAction} isPending={isPending} />;
 }

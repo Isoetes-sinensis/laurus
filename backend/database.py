@@ -1,14 +1,11 @@
 from models.game import Answer, Game, GameBase, Round
-from models.user import User, UserBase
-from pwdlib import PasswordHash
+from models.user import User
 from sqlmodel import create_engine, select, Session, SQLModel
 from typing import Generic, Sequence, Type, TypeVar
 
 
 sqlite_url = f'sqlite:///database.db'
 engine = create_engine(sqlite_url, echo=True)
-
-password_hash = PasswordHash.recommended()
 
 
 def create_db_and_tables():

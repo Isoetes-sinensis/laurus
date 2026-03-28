@@ -26,7 +26,6 @@ def verify_password(password: str, hash: str) -> bool:
     return password_hash.verify(password, hash)
 
 
-import json
 def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: Session = Depends(get_session)):
     try:
         payload = jwt.decode(token, os.getenv('JWT_SECRET_KEY'), algorithms=[str(os.getenv('JWT_ALGORITHM'))])

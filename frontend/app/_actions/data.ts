@@ -1,4 +1,4 @@
-import type { INaturalistObsType, INaturalistTaxaType, User } from "@/app/_actions/types";
+import type { Game, INaturalistObsType, INaturalistTaxaType, User } from "@/app/_actions/types";
 import { cookies } from "next/headers";
 
 // Fetch iNaturalist observation data.
@@ -63,11 +63,28 @@ export async function fetchCurrentUser(): Promise<User> {
     try {
         const res = await fetchWithAuth('http://localhost:8000/users/current');
         if (!res.ok) {
-            console.log(res.status, res.statusText);
-            throw new Error('Not authenticated');
+            throw new Error(`HTTP Error ${res.status}: ${res.statusText}`);
         }
         const data = await res.json();
         return {id: Number(data.id), name: data.name};
+    } catch (error) {
+        console.log(error); // Add functions to deal with errors.
+        throw error;
+    }
+}
+
+export async function fetchGameHistory(offset?: number, limit?: number): Promise<Game[]> {
+    const searchParams = new URLSearchParams();
+    if (offset !== undefined && offset !== null) searchParams.append('offset', offset.toString());
+    if (limit !== undefined && limit !== null) searchParams.append('limit', limit.toString());
+
+    try {
+        const res = await fetchWithAuth(`http://localhost:8000/users/current/games?${searchParams.toString()}`);
+        if (!res.ok) {
+            throw new Error(`HTTP Error ${res.status}: ${res.statusText}`);
+        }
+        const data = await res.json();
+        return data;
     } catch (error) {
         console.log(error); // Add functions to deal with errors.
         throw error;

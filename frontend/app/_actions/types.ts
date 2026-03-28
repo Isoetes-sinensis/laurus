@@ -30,7 +30,7 @@ export type TaxonNames = {
     specEpithet: string; 
 }
 
-type Answer = {
+type AnswerState = {
     userAnswer: string;
     correctAnswer: string;
     correct: boolean;
@@ -40,14 +40,14 @@ type RoundState = {
     round: number;
     photoLink: string;
     taxonId: number;
-    family: Answer;
-    genus: Answer;
-    specEpithet: Answer;
+    family: AnswerState;
+    genus: AnswerState;
+    specEpithet: AnswerState;
     score: number;
 }
 
 export type GameState = {
-    mode: 'default';
+    mode: string;
     maxRound: number;
     totalScore: number;
     currentRound: number;
@@ -68,4 +68,31 @@ export type LoginFormState = {
 export type User = {
     id: number,
     name: string
+}
+
+export type Game = {
+    id: number;
+    userId: number;
+    mode: string;
+    roundCount: number;
+    completedAt: string;
+    score: number;
+}
+
+export type Round = {
+    id: number;
+    gameId: number;
+    round: number;
+    photoLink: string;
+    taxonId: number;
+    score: number;
+}
+
+export type Answer = {
+    id: number;
+    roundId: number;
+    rank: string;
+    userAnswer?: string;
+    correctAnswer: string;
+    correct: boolean;
 }

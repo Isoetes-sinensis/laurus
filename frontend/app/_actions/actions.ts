@@ -1,19 +1,19 @@
 'use server';
 
-import { fetchINaturalistObsAndPhoto, fetchINaturalistTaxa } from "@/app/_actions/data";
+import { fetchINaturalistObsAndPhoto, fetchINaturalistTaxa, fetchWithAuth } from "@/app/_actions/data";
 import { GameState, LoginFormState } from "@/app/_actions/types";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import z from "zod";
 
-// Submit and check user answers.
+// Submits and checks user answers.
 export async function submitAnswers(prevState: GameState, formData: FormData) {
     // (Validate form data.)
 
     let state = JSON.parse(JSON.stringify(prevState));
 
-    // Go to the next round if user chooses to continue.
+    // Goes to the next round if user chooses to continue.
     if (state.submitted) {
         // Game completed when reaching the maximum round.
         if (state.currentRound >= state.maxRound) {
@@ -23,7 +23,7 @@ export async function submitAnswers(prevState: GameState, formData: FormData) {
             state.submitted = false;
             state.currentRound += 1;
 
-            // Fetch new data before the next round.
+            // Fetches new data before the next round.
             const {photoLink, data} = await fetchINaturalistObsAndPhoto('large');
             state.rounds.push({ 
                 round: state.currentRound,
@@ -37,22 +37,22 @@ export async function submitAnswers(prevState: GameState, formData: FormData) {
         }
     }
 
-    // Check the answers after submission.
+    // Checks the answers after submission.
     else {
         state.submitted = true;
 
-        // Get actual taxon names.
+        // Gets actual taxon names.
         const taxonData = await fetchINaturalistTaxa(state.rounds[state.currentRound - 1].taxonId);
         const specEpithet = taxonData.name.split(' ')[1];
         const genus = taxonData.ancestors.find(ancestor => ancestor.rank === 'genus')?.name as string;
         const family = taxonData.ancestors.find(ancestor => ancestor.rank === 'family')?.name as string;
 
-        // Get user's answers.
+        // Gets user's answers.
         const familyAnswer = (formData.get('family') ?? '') as string;
         const genusAnswer = (formData.get('genus') ?? '') as string;
         const specEpithetAnswer = (formData.get('species') ?? '') as string;
 
-        // Calculate user's score.
+        // Calculates user's score.
         let score = 0;
         let familyCorrect = false;
         let genusCorrect = false;
@@ -79,6 +79,25 @@ export async function submitAnswers(prevState: GameState, formData: FormData) {
     }
 
     return state;
+}
+
+export async function saveGame(state: GameState) {
+    try {
+        const res = await fetchWithAuth('http://localhost:8000/users/current/games', {
+            method: 'POST',
+            body: JSON.stringify(state),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // Returns a boolean value indicating whether the game data are successfully saved.
+        if (!res.ok) return false;
+        return true;
+    } catch (error) {
+        console.log(error); // Add functions to deal with errors.
+        throw error;
+    }
 }
 
 // Login.
