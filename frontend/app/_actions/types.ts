@@ -64,3 +64,8 @@ export type LoginFormState = {
     }
     message?: string[];
 }
+
+export type User = {
+    id: number,
+    name: string
+}

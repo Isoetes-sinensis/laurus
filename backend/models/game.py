@@ -17,7 +17,7 @@ class Game(GameBase, table=True):
 
 class Round(GameBase, table=True):
     game_id: int = Field(foreign_key='game.id', index=True)
-    round: int = Field(unique=True)
+    round: int
     photo_link: str
     taxon_id: int
     score: int # Stored as log data, even though can be calculated.

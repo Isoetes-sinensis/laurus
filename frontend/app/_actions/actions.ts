@@ -122,7 +122,8 @@ export async function login(prevState: LoginFormState, formData: FormData) {
             cookieStore.set({
                 name: 'access_token',
                 value: data.access_token,
-                httpOnly: true
+                httpOnly: true,
+                sameSite: 'lax'
             }); // Store the access token in cookies.
             redirect('/');
         }

@@ -1,4 +1,5 @@
-import type { INaturalistObsType, INaturalistTaxaType } from "@/app/_actions/types";
+import type { INaturalistObsType, INaturalistTaxaType, User } from "@/app/_actions/types";
+import { cookies } from "next/headers";
 
 // Fetch iNaturalist observation data.
 export async function fetchINaturalistObs(): Promise<INaturalistObsType> {
@@ -43,4 +44,32 @@ export async function fetchINaturalistObsAndPhoto(size: 'square' | 'medium' | 'l
     photoLink = photoLink.replace('square', size); // (Check if there is an image in the required size.)
     
     return {data, photoLink};
+}
+
+export async function fetchWithAuth(url: string, options: RequestInit = {}) {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('access_token')?.value;
+
+    return fetch(url, {
+        ...options,
+        headers: {
+            ...options.headers,
+            'Authorization': `Bearer ${token}`
+        }
+    });
+}
+
+export async function fetchCurrentUser(): Promise<User> {
+    try {
+        const res = await fetchWithAuth('http://localhost:8000/users/current');
+        if (!res.ok) {
+            console.log(res.status, res.statusText);
+            throw new Error('Not authenticated');
+        }
+        const data = await res.json();
+        return {id: Number(data.id), name: data.name};
+    } catch (error) {
+        console.log(error); // Add functions to deal with errors.
+        throw error;
+    }
 }

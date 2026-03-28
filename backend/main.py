@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from database import create_db_and_tables
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import auth, answers, games, rounds
+from routers import auth, answers, games, rounds, users
 
 
 @asynccontextmanager
@@ -17,6 +17,7 @@ app.include_router(auth.router)
 app.include_router(games.router)
 app.include_router(rounds.router)
 app.include_router(answers.router)
+app.include_router(users.router)
 
 app.add_middleware(
     CORSMiddleware,

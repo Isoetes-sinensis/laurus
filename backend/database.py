@@ -1,5 +1,5 @@
 from models.game import Answer, Game, GameBase, Round
-from models.user import User
+from models.user import User, UserBase
 from pwdlib import PasswordHash
 from sqlmodel import create_engine, select, Session, SQLModel
 from typing import Generic, Sequence, Type, TypeVar
@@ -20,9 +20,26 @@ def get_session():
         yield session
 
 
-def get_user(name: str) -> User | None:
-    user = User(id=123, name='testuser', password=password_hash.hash('testpwd'))
-    return user
+class UserDB:
+    def __init__(self, session: Session | None = None) -> None:
+        if session is None:
+            self.session = Session(engine)
+        else:
+            self.session = session
+
+    def create(self, model: User) -> User:
+        self.session.add(model)
+        self.session.commit()
+        self.session.refresh(model)
+        return model
+    
+    def read(self, id: int) -> User | None:
+        result = self.session.exec(select(User).where(User.id == id)).first()
+        return result
+    
+    def read_by_name(self, name: str) -> User | None:
+        result = self.session.exec(select(User).where(User.name == name)).first()
+        return result
 
 
 T = TypeVar('T', bound=GameBase)

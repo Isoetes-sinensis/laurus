@@ -11,7 +11,7 @@ router = APIRouter(
 DUMMY_CURRENT_USER = 123
 
 
-@router.post('/')
+@router.post('/', status_code=status.HTTP_201_CREATED)
 def create_game(data: GameIn, session: Session = Depends(get_session)):
     try:
         game = Game(user_id=DUMMY_CURRENT_USER, mode=data.mode, round_count=data.maxRound, completed_at=data.completedAt, score=data.totalScore)
